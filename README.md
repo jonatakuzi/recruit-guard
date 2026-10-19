@@ -30,7 +30,7 @@ docker run -p 8080:8080 ghcr.io/jonatakuzi/recruit-guard
 **Or download the app** (needs Java 21): grab `recruit-guard-*.jar` from the [latest release](https://github.com/jonatakuzi/recruit-guard/releases/latest), then:
 
 ```bash
-java -jar recruit-guard-1.1.0.jar
+java -jar recruit-guard-1.1.1.jar
 ```
 
 Open **http://localhost:8080**, click **Try a fake offer**, and you'll see the result above.

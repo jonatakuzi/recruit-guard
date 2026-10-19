@@ -13,7 +13,7 @@
 
     <groupId>com.jonatakuzi</groupId>
     <artifactId>recruit-guard</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>Recruit Guard</name>
     <description>REST API that scores recruiter messages for job-scam red flags</description>
 
