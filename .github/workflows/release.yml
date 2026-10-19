@@ -1,0 +1,54 @@
+name: Release
+
+# Runs when a version tag like v1.1.0 is pushed. Publishes:
+#  - a GitHub Release with the runnable jar attached
+#  - a Docker image at ghcr.io/jonatakuzi/recruit-guard
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # create the GitHub Release
+  packages: write   # push to GitHub Container Registry
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and test
+        run: mvn -B verify
+
+      - name: Create GitHub Release with the jar
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/recruit-guard-*.jar
+          generate_release_notes: true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Check recruiter emails for job-scam red flags
+            org.opencontainers.image.licenses=MIT

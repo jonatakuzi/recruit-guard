@@ -6,7 +6,7 @@ This is the guide to explaining the project out loud. If you can talk through ev
 
 ## The 30-second pitch
 
-> "During my job search I got an email from a fake Ocient recruiter on a look-alike domain. I caught it by checking the domain myself, and realized the checks I was doing by hand could be automated. So I built Recruit Guard: a Spring Boot REST API that takes a recruiter's email and scores it 0 to 100 for scam risk. It detects look-alike domains using edit distance and character normalization, flags requests for things like your SSN, reads the email's SPF, DKIM, and DMARC results, and explains every point of the score. It has 49 tests at 97% coverage, a CI pipeline in GitHub Actions, and runs in Docker."
+> "During my job search I got an email from a fake Ocient recruiter on a look-alike domain. I caught it by checking the domain myself, and realized the checks I was doing by hand could be automated. So I built Recruit Guard: a Spring Boot REST API that takes a recruiter's email and scores it 0 to 100 for scam risk. It detects look-alike domains using edit distance and character normalization, flags requests for things like your SSN, reads the email's SPF, DKIM, and DMARC results, and explains every point of the score. It parses the full raw email with Jakarta Mail, has 59 tests at 97% coverage, and every tagged version ships automatically as a downloadable jar and a Docker image through GitHub Actions."
 
 ---
 
@@ -19,6 +19,23 @@ This is the guide to explaining the project out loud. If you can talk through ev
 5. It loops over **every `ScanRule`**, collects all the `Finding`s, sorts them most-severe-first, and adds up the points (capped at 100).
 6. The score maps to a **`Verdict`**: 50+ is LIKELY_SCAM, 20-49 SUSPICIOUS, under 20 LOW_RISK.
 7. Spring turns the `ScanReport` record into JSON automatically.
+
+---
+
+## Reading a full email - `RawEmailParser`
+
+When someone pastes the whole original email (`POST /api/v1/scan/raw`), the parser hands it to **Jakarta Mail's `MimeMessage`**, the standard Java library for the email format (MIME). That library deals with the messy parts so I don't have to:
+
+- **Folded headers:** a long header can wrap onto several lines that start with a space.
+- **Encoded headers:** non-English names arrive as `=?UTF-8?B?...?=` and get decoded.
+- **Multipart bodies:** most emails contain a plain-text and an HTML copy. I walk the parts recursively, prefer `text/plain`, skip attachments, and fall back to HTML converted to text.
+- **Transfer encodings:** base64 and quoted-printable are decoded automatically.
+
+Two safety choices worth mentioning: recursion stops at 10 levels deep (a malicious email could nest parts forever), and input over 1 MB is rejected. If the paste has no `From:` header, the API returns a 400 that tells the user to paste the full original instead.
+
+The parsed From, Reply-To, body, and headers become a normal `ScanRequest`, so **every existing rule works on raw emails with no changes**. That's the payoff of keeping the rules independent of where the data came from.
+
+**Frontend tie-in:** each finding has an `evidence` string. The page searches the email text for it and wraps it in a `<mark>`, which is how warnings show up underlined right inside the email. When two findings point at the same text, the more severe one gets the mark and the other note links to it.
 
 ---
 
@@ -98,5 +115,5 @@ Adding a company is a data change, not a code change. No recompiling logic.
 | What's the time complexity of a scan? | Linear in message length for the regex rules, plus O(companies x name length squared) for edit distance. Both tiny in practice. |
 | How would you scale it? | It's stateless, so you can run many copies behind a load balancer. Compiled regex patterns are reused across requests. |
 | What would you improve? | WHOIS/RDAP domain-age lookups, the full Public Suffix List, `.eml` uploads, and weights tuned on real scam data. |
-| How do you know it works? | 49 automated tests covering scam and legitimate emails, run in CI on every push. |
+| How do you know it works? | 59 automated tests covering scam and legitimate emails, run in CI on every push. |
 | Could a scammer get around it? | Yes. A brand-new domain with no brand name in it and a clean message would score low. That's why the verdict always says to verify on the company's real careers site, and why domain age is my next feature. |

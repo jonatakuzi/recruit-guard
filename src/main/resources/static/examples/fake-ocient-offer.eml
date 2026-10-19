@@ -1,0 +1,34 @@
+Delivered-To: jobseeker@example.com
+Authentication-Results: mx.google.com;
+       dkim=none;
+       spf=softfail (domain of transitioning hiring@ocient-careers.com does not designate 203.0.113.9 as permitted sender) smtp.mailfrom=hiring@ocient-careers.com;
+       dmarc=fail (p=NONE) header.from=ocient-careers.com
+From: "Ocient Talent Team" <hiring@ocient-careers.com>
+Reply-To: ocient.onboarding@gmail.com
+To: jobseeker@example.com
+Subject: Offer Letter - Junior Software Engineer (Remote)
+Date: Mon, 19 Oct 2026 09:14:02 -0400
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Congratulations! After reviewing your resume, you have been selected for th=
+e Junior Software Engineer position at Ocient. No interview is required.
+
+To complete onboarding, reply within 24 hours with your Social Security num=
+ber and bank account details for direct deposit.
+
+We will mail you a check to purchase your equipment from our vendor. Please=
+ deposit the check as soon as it arrives.
+
+Ocient Talent Acquisition
+
+--b1
+Content-Type: text/html; charset="UTF-8"
+
+<p>Congratulations! You have been selected for the Junior Software Engineer position at Ocient.</p>
+
+--b1--

@@ -1,5 +1,6 @@
 package com.jonatakuzi.recruitguard.web;
 
+import com.jonatakuzi.recruitguard.email.InvalidEmailException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler({ConstraintViolationException.class, MissingServletRequestParameterException.class})
     public ProblemDetail handleInvalidParam(Exception ex) {
+        return badRequest(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public ProblemDetail handleInvalidEmail(InvalidEmailException ex) {
         return badRequest(ex.getMessage());
     }
 

@@ -14,7 +14,7 @@ public class OpenApiConfig {
     public OpenAPI recruitGuardApi() {
         return new OpenAPI().info(new Info()
                 .title("Recruit Guard API")
-                .version("1.0.0")
+                .version("1.1.0")
                 .description("Scores recruiter emails for job-scam red flags: look-alike domains, "
                         + "requests for sensitive data, payment schemes, and failed email authentication.")
                 .license(new License().name("MIT")));

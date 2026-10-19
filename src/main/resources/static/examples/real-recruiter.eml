@@ -1,0 +1,18 @@
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@ocient.com;
+       spf=pass smtp.mailfrom=slee@ocient.com;
+       dmarc=pass (p=REJECT) header.from=ocient.com
+From: Sarah Lee <slee@ocient.com>
+To: jobseeker@example.com
+Subject: Associate Software Engineer role at Ocient
+Date: Mon, 19 Oct 2026 10:02:44 -0400
+MIME-Version: 1.0
+Content-Type: text/html; charset="UTF-8"
+
+<html><body>
+<p>Hi Jon,</p>
+<p>I&#39;m a recruiter at Ocient and came across your profile. I think you&#39;d be a good fit for our
+Associate Software Engineer opening.</p>
+<p>Are you free for a 30-minute phone screen next week? You can find the full posting on our careers page.</p>
+<p>Thanks,<br>Sarah</p>
+</body></html>

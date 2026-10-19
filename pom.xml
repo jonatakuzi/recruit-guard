@@ -13,7 +13,7 @@
 
     <groupId>com.jonatakuzi</groupId>
     <artifactId>recruit-guard</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>Recruit Guard</name>
     <description>REST API that scores recruiter messages for job-scam red flags</description>
 
@@ -33,6 +33,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- Parses raw emails (MIME): headers, multipart bodies, encodings -->
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>

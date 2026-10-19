@@ -42,6 +42,30 @@ class ScanControllerTest {
     }
 
     @Test
+    void scansRawEmailFile() throws Exception {
+        String raw = java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/static/examples", "fake-ocient-offer.eml"));
+        mvc.perform(post("/api/v1/scan/raw").contentType(MediaType.TEXT_PLAIN).content(raw))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email.replyTo").value("ocient.onboarding@gmail.com"))
+                .andExpect(jsonPath("$.report.verdict").value("LIKELY_SCAM"))
+                .andExpect(jsonPath("$.report.findings[*].ruleId").value(hasItem("email-auth-dmarc")));
+    }
+
+    @Test
+    void rawScanPassesRealRecruiter() throws Exception {
+        String raw = java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/static/examples", "real-recruiter.eml"));
+        mvc.perform(post("/api/v1/scan/raw").contentType(MediaType.TEXT_PLAIN).content(raw))
+                .andExpect(jsonPath("$.report.verdict").value("LOW_RISK"));
+    }
+
+    @Test
+    void rawScanExplainsMissingHeaders() throws Exception {
+        mvc.perform(post("/api/v1/scan/raw").contentType(MediaType.TEXT_PLAIN).content("hello, no headers here"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("From:")));
+    }
+
+    @Test
     void domainCheckFlagsLookalike() throws Exception {
         mvc.perform(get("/api/v1/domains/check").param("domain", "hr@ocient.co"))
                 .andExpect(status().isOk())

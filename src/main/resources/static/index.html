@@ -4,173 +4,451 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Recruit Guard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Crect x='1.5' y='5' width='23' height='16' rx='2.5' fill='white' stroke='%2316202c' stroke-width='2'/%3E%3Cpath d='M2.5 6.5 13 14l10.5-7.5' fill='none' stroke='%2316202c' stroke-width='2'/%3E%3Cpath d='M5 23.5c2-1.6 3-1.6 5 0s3 1.6 5 0 3-1.6 5 0' fill='none' stroke='%23c2362b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="Check a recruiter email for job-scam red flags before you reply.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0f14; --panel: #121821; --line: #1f2a37; --text: #e6edf3; --muted: #8b98a8;
-    --accent: #3fb6ff; --low: #2ecc71; --mid: #f5b941; --high: #ff5d5d;
+    --page: #e9eef3;
+    --sheet: #ffffff;
+    --ink: #16202c;
+    --ink-soft: #4d5b6b;
+    --rule: #d3dbe4;
+    --blue: #2348c7;
+    --blue-deep: #18339a;
+    --high: #c2362b;
+    --high-wash: #fbe9e7;
+    --mid: #a86a12;
+    --mid-wash: #fbf1df;
+    --low: #2e7550;
+    --low-wash: #e5f2ea;
+    --serif: "Source Serif 4", Georgia, serif;
+    --sans: "Public Sans", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 Inter, system-ui, sans-serif; }
-  header { border-bottom: 1px solid var(--line); padding: 18px 24px; display: flex; align-items: center; gap: 12px; }
-  header .logo { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 18px; }
-  header .logo span { color: var(--accent); }
-  header nav { margin-left: auto; display: flex; gap: 18px; }
-  header a { color: var(--muted); text-decoration: none; font-size: 14px; }
-  header a:hover { color: var(--text); }
-  main { max-width: 1100px; margin: 0 auto; padding: 28px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
-  h1 { font-size: 22px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 0 0 14px; color: var(--muted); font-weight: 500; }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
-  input, textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--text);
-    padding: 9px 10px; font: 14px "IBM Plex Mono", monospace; }
-  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-  textarea { min-height: 160px; resize: vertical; }
-  details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 12px; }
-  .row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-  button { border: 0; border-radius: 6px; padding: 10px 16px; font: 600 14px Inter, sans-serif; cursor: pointer; }
-  .primary { background: var(--accent); color: #04131f; } .primary:hover { filter: brightness(1.1); }
-  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); } .ghost:hover { color: var(--text); }
-  .gauge { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
-  .score { font: 600 48px "IBM Plex Mono", monospace; min-width: 96px; }
-  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 8px; }
-  .bar div { height: 100%; width: 0; transition: width .5s ease, background .5s; }
-  .verdict { font-weight: 700; } .advice { color: var(--muted); font-size: 14px; }
-  .finding { border-left: 3px solid var(--line); padding: 8px 12px; margin: 10px 0; background: var(--bg); border-radius: 0 6px 6px 0; }
-  .finding .tag { font: 600 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .5px; }
-  .finding code { color: var(--muted); font-size: 12px; word-break: break-all; }
-  .HIGH { border-color: var(--high); } .HIGH .tag { color: var(--high); }
-  .MEDIUM { border-color: var(--mid); } .MEDIUM .tag { color: var(--mid); }
-  .LOW, .INFO { border-color: var(--low); } .LOW .tag, .INFO .tag { color: var(--low); }
-  .empty { color: var(--muted); text-align: center; padding: 60px 0; }
-  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 20px; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.5 var(--sans); }
+  a { color: var(--blue); }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+  /* Masthead */
+  .masthead { padding: 28px 0 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; }
+  .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+  .brand svg { flex: none; }
+  .masthead nav { margin-left: auto; display: flex; gap: 18px; font-size: 15px; }
+  .masthead nav a { color: var(--ink-soft); text-decoration: none; }
+  .masthead nav a:hover { color: var(--ink); text-decoration: underline; }
+
+  .intro { padding: 24px 0 28px; max-width: 760px; }
+  .intro h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.05; letter-spacing: -0.035em; margin: 0 0 14px; font-weight: 800; }
+  .intro p { font-size: 18px; color: var(--ink-soft); margin: 0; max-width: 62ch; }
+
+  /* Input sheet */
+  .sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; }
+  .composer { padding: 22px 24px 24px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); margin: -4px 0 18px; }
+  .tab { appearance: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px 9px;
+         font: 600 15px var(--sans); color: var(--ink-soft); cursor: pointer; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--blue); }
+  .panel[hidden] { display: none; }
+
+  label { display: block; font-weight: 600; font-size: 14px; margin: 0 0 6px; }
+  .hint { color: var(--ink-soft); font-size: 14px; margin: 6px 0 0; }
+  input[type=text], textarea {
+    width: 100%; border: 1px solid var(--rule); border-radius: 8px; background: #fbfcfd; color: var(--ink);
+    padding: 11px 12px; font: 15px/1.5 var(--sans);
+  }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px #2348c71f; background: #fff; }
+  textarea { resize: vertical; }
+  #raw { min-height: 220px; font-size: 14px; line-height: 1.45; }
+  .drop { position: relative; }
+  .drop.dragging textarea { border-color: var(--blue); border-style: dashed; background: #eef2fd; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fields .full { grid-column: 1 / -1; }
+  #body { min-height: 170px; }
+
+  details.help { margin-top: 12px; font-size: 14px; color: var(--ink-soft); }
+  details.help summary { cursor: pointer; color: var(--blue); font-weight: 600; }
+  details.help dl { margin: 10px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; }
+  details.help dt { font-weight: 600; color: var(--ink); }
+  details.help dd { margin: 0; }
+
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+  .btn { appearance: none; border-radius: 8px; padding: 11px 18px; font: 600 15px var(--sans); cursor: pointer; border: 1px solid transparent; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-deep); }
+  .btn-quiet { background: transparent; color: var(--ink); border-color: var(--rule); }
+  .btn-quiet:hover { border-color: var(--ink-soft); }
+  .actions .spacer { flex: 1; }
+  .file-btn { margin: 0; display: inline-flex; align-items: center; font-size: 15px; position: relative; }
+  .file-btn:focus-within { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .file-btn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+  /* Results */
+  #results { margin: 28px 0 40px; }
+  #results:empty { display: none; }
+  .results { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .results { grid-template-columns: 1fr; } .fields { grid-template-columns: 1fr; } }
+
+  /* The marked-up letter */
+  .letter { padding: 0; overflow: hidden; }
+  .envelope { padding: 18px 24px; border-bottom: 1px solid var(--rule); background: #f7f9fb; font-size: 15px; }
+  .envelope div { display: grid; grid-template-columns: 76px 1fr; gap: 10px; padding: 3px 0; }
+  .envelope .k { color: var(--ink-soft); }
+  .envelope .v { word-break: break-word; }
+  .envelope .subject { font-weight: 700; }
+  .letter-body { padding: 22px 24px 28px; font: 18px/1.75 var(--serif); white-space: pre-wrap; word-break: break-word; max-height: 640px; overflow: auto; }
+  .letter-caption { padding: 0 24px 18px; font-size: 14px; color: var(--ink-soft); }
+
+  mark { background: transparent; color: inherit; padding: 0 1px; border-radius: 2px;
+         text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  mark.HIGH { text-decoration-style: wavy; text-decoration-color: var(--high); background: var(--high-wash); }
+  mark.MEDIUM { text-decoration-style: wavy; text-decoration-color: var(--mid); background: var(--mid-wash); }
+  mark.LOW, mark.INFO { text-decoration-style: dotted; text-decoration-color: var(--low); background: var(--low-wash); }
+  mark sup { font: 700 11px var(--sans); margin-left: 2px; vertical-align: super; line-height: 0; }
+  mark.HIGH sup { color: var(--high); } mark.MEDIUM sup { color: var(--mid); } mark.LOW sup { color: var(--low); }
+  mark.flash { animation: flash 1.2s ease; }
+  @keyframes flash { 0%, 40% { box-shadow: 0 0 0 4px #2348c74d; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* Verdict */
+  .verdict { padding: 22px 24px; }
+  .verdict h2 { font-size: 30px; line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 8px; font-weight: 800; }
+  .verdict p { margin: 0; color: var(--ink-soft); }
+  .meter { margin: 20px 0 6px; }
+  .meter-track { position: relative; height: 10px; border-radius: 5px;
+    background: linear-gradient(to right, var(--low-wash) 0 20%, var(--mid-wash) 20% 50%, var(--high-wash) 50% 100%); }
+  .meter-fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 5px; transition: width .7s cubic-bezier(.2,.8,.2,1); }
+  .meter-scale { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+  .meter-scale b { color: var(--ink); }
+
+  .notes { list-style: none; margin: 0; padding: 0 24px 8px; }
+  .note { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--rule); }
+  .note .num { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--sans); color: #fff; }
+  .note.HIGH .num { background: var(--high); } .note.MEDIUM .num { background: var(--mid); } .note.LOW .num, .note.INFO .num { background: var(--low); }
+  .note h3 { font-size: 15px; margin: 0 0 2px; }
+  .note.HIGH h3 { color: var(--high); } .note.MEDIUM h3 { color: var(--mid); } .note.LOW h3 { color: var(--low); }
+  .note p { margin: 0; font-size: 15px; }
+  .note .where { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+  .note button.jump { appearance: none; background: none; border: 0; padding: 0; color: var(--blue); font: inherit; cursor: pointer; text-decoration: underline; }
+  .clean { padding: 18px 24px 22px; border-top: 1px solid var(--rule); }
+  .clean p { margin: 0 0 8px; }
+  .next { padding: 16px 24px 22px; border-top: 1px solid var(--rule); font-size: 15px; }
+  .next h3 { font-size: 15px; margin: 0 0 6px; }
+  .next ul { margin: 0; padding-left: 18px; }
+  .next li { margin: 3px 0; }
+  .verdict-actions { padding: 0 24px 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .error { padding: 18px 22px; border-left: 4px solid var(--high); background: var(--sheet); border-radius: 8px; }
+  .error h2 { font-size: 17px; margin: 0 0 4px; }
+  .error p { margin: 0; }
+
+  footer { border-top: 1px solid var(--rule); padding: 22px 0 34px; color: var(--ink-soft); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { .meter-fill { transition: none; } mark.flash { animation: none; } }
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">recruit<span>_</span>guard</div>
-  <nav><a href="/docs">API docs</a><a href="/actuator/health">Health</a></nav>
-</header>
 
-<main>
-  <section class="panel">
-    <h1>Is this recruiter real?</h1>
-    <h2>Paste a recruiter email to check it for job-scam red flags.</h2>
-    <form id="scan-form">
-      <label for="sender">From address</label>
-      <input id="sender" required placeholder="hiring@company-careers.com">
-      <label for="body">Message</label>
-      <textarea id="body" required placeholder="Paste the email body here..."></textarea>
-      <details>
-        <summary>More options (Reply-To, company, raw headers)</summary>
-        <label for="replyTo">Reply-To address</label>
-        <input id="replyTo" placeholder="optional">
-        <label for="company">Company they claim to represent</label>
-        <input id="company" placeholder="detected automatically if blank">
-        <label for="headers">Raw email headers</label>
-        <textarea id="headers" style="min-height:80px" placeholder="optional - lets us read SPF/DKIM/DMARC results"></textarea>
-      </details>
-      <div class="row">
-        <button class="primary" type="submit">Scan message</button>
-        <button class="ghost" type="button" id="demo-scam">Load scam example</button>
-        <button class="ghost" type="button" id="demo-legit">Load real example</button>
+<div class="wrap">
+  <header class="masthead">
+    <a class="brand" href="/">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <rect x="1.5" y="5" width="23" height="16" rx="2.5" fill="none" stroke="#16202c" stroke-width="2"/>
+        <path d="M2.5 6.5 13 14l10.5-7.5" fill="none" stroke="#16202c" stroke-width="2"/>
+        <path d="M5 23.5c2-1.6 3-1.6 5 0s3 1.6 5 0 3-1.6 5 0" fill="none" stroke="#c2362b" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Recruit Guard
+    </a>
+    <nav aria-label="Project links">
+      <a href="/docs">API docs</a>
+      <a href="https://github.com/jonatakuzi/recruit-guard">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="intro">
+    <h1>Check a recruiter's email before you reply.</h1>
+    <p>Fake job offers copy real company names, ask for your Social Security number, and mail you bad checks. Paste the email here and Recruit Guard marks every warning sign in it.</p>
+  </section>
+
+  <section class="sheet composer" aria-label="Email to check">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-raw" aria-controls="panel-raw" aria-selected="true">Paste the full email</button>
+      <button class="tab" role="tab" id="tab-fields" aria-controls="panel-fields" aria-selected="false" tabindex="-1">Enter details yourself</button>
+    </div>
+
+    <form id="form" novalidate>
+      <div class="panel" id="panel-raw" role="tabpanel" aria-labelledby="tab-raw">
+        <label for="raw">Original email, including the headers at the top</label>
+        <div class="drop" id="drop">
+          <textarea id="raw" spellcheck="false" placeholder="Paste here, or drop a .eml file onto this box."></textarea>
+        </div>
+        <details class="help">
+          <summary>How do I get the full email?</summary>
+          <dl>
+            <dt>Gmail</dt><dd>Open the email, click the three dots next to Reply, choose Show original, then Copy to clipboard.</dd>
+            <dt>Outlook</dt><dd>Open the email, click the three dots, choose View, then View message source.</dd>
+            <dt>Apple Mail</dt><dd>Open the email, then View, Message, Raw Source.</dd>
+          </dl>
+          <p class="hint">The full email lets Recruit Guard read the Reply-To address and the sender checks (SPF, DKIM, DMARC) that mail servers record.</p>
+        </details>
+      </div>
+
+      <div class="panel" id="panel-fields" role="tabpanel" aria-labelledby="tab-fields" hidden>
+        <div class="fields">
+          <div>
+            <label for="sender">From</label>
+            <input type="text" id="sender" placeholder="hiring@company.com" autocomplete="off">
+          </div>
+          <div>
+            <label for="replyTo">Reply-To <span class="hint">(if different)</span></label>
+            <input type="text" id="replyTo" autocomplete="off">
+          </div>
+          <div class="full">
+            <label for="body">Message</label>
+            <textarea id="body"></textarea>
+          </div>
+          <div class="full">
+            <label for="company">Company they say they recruit for <span class="hint">(optional, found automatically)</span></label>
+            <input type="text" id="company" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Check this email</button>
+        <label class="btn btn-quiet file-btn">Open .eml file<input type="file" id="file" accept=".eml,message/rfc822,text/plain"></label>
+        <span class="spacer"></span>
+        <button class="btn btn-quiet" type="button" data-example="fake-ocient-offer.eml">Try a fake offer</button>
+        <button class="btn btn-quiet" type="button" data-example="real-recruiter.eml">Try a real one</button>
       </div>
     </form>
   </section>
 
-  <section class="panel" id="result" aria-live="polite">
-    <div class="empty">Results will appear here.</div>
-  </section>
-</main>
+  <section id="results" aria-live="polite"></section>
+</div>
 
-<footer>Built by Jon &middot; Java 21 &middot; Spring Boot &middot; <a href="https://github.com/jonatakuzi/recruit-guard" style="color:inherit">source</a></footer>
+<footer>
+  <div class="wrap">
+    <span>Built by Jon with Java 21 and Spring Boot.</span>
+    <a href="https://github.com/jonatakuzi/recruit-guard">Source code</a>
+    <a href="/docs">REST API</a>
+    <span>Recruit Guard gives warning signs, not guarantees. Always confirm a job on the company's own careers site.</span>
+  </div>
+</footer>
 
 <script>
-  const $ = (id) => document.getElementById(id);
-  const examples = {
-    scam: {
-      sender: "Talent Team <hiring@ocient-careers.com>",
-      replyTo: "ocient.onboarding@gmail.com",
-      body: "Congratulations! You have been selected for the Junior Software Engineer role at Ocient. "
-          + "No interview is required. Reply within 24 hours with your Social Security number and bank "
-          + "account details for direct deposit. We will mail you a check to purchase your equipment from our vendor.",
-      headers: "Authentication-Results: mx.google.com; spf=fail; dkim=none; dmarc=fail"
-    },
-    legit: {
-      sender: "Sarah Lee <slee@ocient.com>", replyTo: "",
-      body: "Hi Jon, I'm a recruiter at Ocient. I think you'd be a good fit for our Associate Software Engineer "
-          + "opening. Are you free for a 30-minute phone screen next week? The posting is on our careers page.",
-      headers: "Authentication-Results: mx.google.com; spf=pass; dkim=pass; dmarc=pass"
-    }
-  };
+(() => {
+  const $ = (sel) => document.querySelector(sel);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  function load(example) {
-    for (const key of ["sender", "replyTo", "body", "headers"]) $(key).value = example[key];
-    $("company").value = "";
-    $("scan-form").requestSubmit();
+  // ---- Tabs ----
+  const tabs = [$("#tab-raw"), $("#tab-fields")];
+  function selectTab(tab) {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", on);
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
   }
-  $("demo-scam").onclick = () => load(examples.scam);
-  $("demo-legit").onclick = () => load(examples.legit);
-
-  function escapeHtml(s) {
-    return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  }
-
-  const verdictLabels = {
-    LOW_RISK: ["Low risk", "var(--low)"],
-    SUSPICIOUS: ["Suspicious", "var(--mid)"],
-    LIKELY_SCAM: ["Likely scam", "var(--high)"]
-  };
-  const advice = {
-    LOW_RISK: "No major red flags found. Still verify the role on the company's own careers site.",
-    SUSPICIOUS: "Don't share personal info until you verify this recruiter independently.",
-    LIKELY_SCAM: "Do not reply with personal or financial information."
-  };
-
-  function render(report) {
-    const [label, color] = verdictLabels[report.verdict];
-    const findings = report.findings.length
-      ? report.findings.map(f => `
-          <div class="finding ${f.severity}">
-            <div class="tag">${f.severity} &middot; ${escapeHtml(f.ruleId)}</div>
-            <div>${escapeHtml(f.message)}</div>
-            ${f.evidence ? `<code>${escapeHtml(f.evidence)}</code>` : ""}
-          </div>`).join("")
-      : `<p class="advice">No red flags matched.</p>`;
-    $("result").innerHTML = `
-      <div class="gauge">
-        <div class="score" style="color:${color}">${report.score}</div>
-        <div style="flex:1">
-          <div class="verdict" style="color:${color}">${label}</div>
-          <div class="advice">${advice[report.verdict]}</div>
-          <div class="bar"><div id="fill"></div></div>
-        </div>
-      </div>
-      ${report.claimedCompany ? `<p class="advice">Claims to be from <b>${escapeHtml(report.claimedCompany)}</b></p>` : ""}
-      ${findings}`;
-    requestAnimationFrame(() => { $("fill").style.width = report.score + "%"; $("fill").style.background = color; });
-  }
-
-  $("scan-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    $("result").innerHTML = `<div class="empty">Scanning...</div>`;
-    const payload = {
-      sender: $("sender").value, replyTo: $("replyTo").value || null,
-      claimedCompany: $("company").value || null, body: $("body").value, headers: $("headers").value || null
-    };
-    try {
-      const res = await fetch("/api/v1/scan", {
-        method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Request failed");
-      render(data);
-    } catch (err) {
-      $("result").innerHTML = `<div class="empty">Error: ${escapeHtml(err.message)}</div>`;
-    }
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => selectTab(t));
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+        selectTab(next); next.focus();
+      }
+    });
   });
+  const rawMode = () => $("#tab-raw").getAttribute("aria-selected") === "true";
+
+  // ---- Loading emails: examples, file picker, drag and drop ----
+  async function loadExample(name) {
+    const res = await fetch("/examples/" + name);
+    $("#raw").value = await res.text();
+    selectTab($("#tab-raw"));
+    $("#form").requestSubmit();
+  }
+  document.querySelectorAll("[data-example]").forEach((b) => b.addEventListener("click", () => loadExample(b.dataset.example)));
+
+  function readFile(file) {
+    if (!file) return;
+    if (file.size > 1_000_000) { showError("That file is over 1 MB.", "Recruit Guard checks one email at a time. Save just the message as .eml and try again."); return; }
+    file.text().then((text) => { $("#raw").value = text; selectTab($("#tab-raw")); $("#form").requestSubmit(); });
+  }
+  $("#file").addEventListener("change", (e) => readFile(e.target.files[0]));
+  const drop = $("#drop");
+  ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("dragging"); }));
+  ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("dragging"); }));
+  drop.addEventListener("drop", (e) => readFile(e.dataTransfer.files[0]));
+
+  // ---- Submitting ----
+  $("#form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    let view;
+    try {
+      if (rawMode()) {
+        const raw = $("#raw").value;
+        if (!raw.trim()) { showError("Paste an email first.", "Copy the full original email from your inbox, or try one of the examples."); return; }
+        const data = await call("/api/v1/scan/raw", "text/plain", raw);
+        view = { from: data.email.from, replyTo: data.email.replyTo, subject: data.email.subject, body: data.email.body, report: data.report };
+      } else {
+        const payload = {
+          sender: $("#sender").value.trim(), replyTo: $("#replyTo").value.trim() || null,
+          claimedCompany: $("#company").value.trim() || null, body: $("#body").value, headers: null
+        };
+        if (!payload.sender || !payload.body.trim()) { showError("Add the sender and the message.", "Both are needed to check an email."); return; }
+        const report = await call("/api/v1/scan", "application/json", JSON.stringify(payload));
+        view = { from: payload.sender, replyTo: payload.replyTo, subject: null, body: payload.body, report };
+      }
+    } catch (err) {
+      showError("Couldn't check that email.", err.message);
+      return;
+    }
+    render(view);
+  });
+
+  async function call(url, type, body) {
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": type }, body });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "The server returned an error (" + res.status + ").");
+    return data;
+  }
+
+  function showError(title, detail) {
+    $("#results").innerHTML = `<div class="error" role="alert"><h2>${esc(title)}</h2><p>${esc(detail)}</p></div>`;
+  }
+
+  // ---- Highlighting evidence inside text ----
+  // Finds each finding's evidence in the text and wraps it in <mark>. Earlier (more severe)
+  // findings win when two overlap.
+  function markUp(text, findings) {
+    const lower = (text || "").toLowerCase();
+    const ranges = [];
+    findings.forEach((f) => {
+      const needle = (f.evidence || "").toLowerCase();
+      if (needle.length < 3) return;
+      let at = lower.indexOf(needle);
+      while (at !== -1) {
+        const end = at + needle.length;
+        const overlap = ranges.find((r) => at < r.end && end > r.start);
+        if (!overlap) {
+          ranges.push({ start: at, end, f });
+          f.found = f.found || f.n;
+        } else if (!f.found) {
+          f.found = overlap.f.n; // same text is already marked by a more serious note
+        }
+        at = lower.indexOf(needle, end);
+      }
+    });
+    ranges.sort((a, b) => a.start - b.start);
+    let html = "", pos = 0;
+    for (const r of ranges) {
+      html += esc(text.slice(pos, r.start));
+      html += `<mark class="${r.f.severity}" data-n="${r.f.n}">${esc(text.slice(r.start, r.end))}<sup>${r.f.n}</sup></mark>`;
+      pos = r.end;
+    }
+    return html + esc((text || "").slice(pos));
+  }
+
+  const verdicts = {
+    LOW_RISK: { title: "No major warning signs.", color: "var(--low)",
+      text: "Nothing in this email matched a known scam pattern. That doesn't prove it's real, so confirm the job before sharing personal details." },
+    SUSPICIOUS: { title: "Be careful with this one.", color: "var(--mid)",
+      text: "Some details don't add up. Don't send personal information until you've confirmed this recruiter works where they say." },
+    LIKELY_SCAM: { title: "This looks like a scam.", color: "var(--high)",
+      text: "Several strong warning signs. Don't reply with personal or financial information, and don't deposit any check they send." }
+  };
+  const severityNames = { HIGH: "Serious", MEDIUM: "Warning", LOW: "Minor", INFO: "Note" };
+
+  function render(view) {
+    const report = view.report;
+    const findings = report.findings.map((f, i) => ({ ...f, n: i + 1, found: false }));
+    const v = verdicts[report.verdict];
+
+    const fromHtml = markUp(view.from, findings);
+    const replyHtml = view.replyTo ? markUp(view.replyTo, findings) : "";
+    const bodyHtml = markUp(view.body, findings);
+
+    const notes = findings.map((f) => `
+      <li class="note ${f.severity}">
+        <span class="num" aria-hidden="true">${f.n}</span>
+        <div>
+          <h3>${severityNames[f.severity]}<span class="sr"> warning ${f.n}</span></h3>
+          <p>${esc(f.message)}</p>
+          <p class="where">${f.found
+            ? `Marked ${f.found} in the email. <button type="button" class="jump" data-n="${f.found}">Show me</button>`
+            : `Found in the email's technical headers: <code>${esc(f.evidence)}</code>`}</p>
+        </div>
+      </li>`).join("");
+
+    $("#results").innerHTML = `
+      <div class="results">
+        <article class="sheet letter" aria-label="The email, with warning signs marked">
+          <div class="envelope">
+            <div><span class="k">From</span><span class="v">${fromHtml}</span></div>
+            ${view.replyTo ? `<div><span class="k">Reply-To</span><span class="v">${replyHtml}</span></div>` : ""}
+            ${view.subject ? `<div><span class="k">Subject</span><span class="v subject">${esc(view.subject)}</span></div>` : ""}
+            ${report.claimedCompany ? `<div><span class="k">Claims</span><span class="v">To recruit for ${esc(report.claimedCompany)}</span></div>` : ""}
+          </div>
+          <div class="letter-body">${bodyHtml || "<em>(No message text)</em>"}</div>
+        </article>
+
+        <aside class="sheet" aria-label="Results">
+          <div class="verdict">
+            <h2 style="color:${v.color}">${v.title}</h2>
+            <p>${v.text}</p>
+            <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${report.score}" aria-label="Risk score">
+              <div class="meter-track"><div class="meter-fill" style="background:${v.color}"></div></div>
+              <div class="meter-scale"><span>Risk score <b>${report.score}</b> of 100</span><span>${findings.length} warning sign${findings.length === 1 ? "" : "s"}</span></div>
+            </div>
+          </div>
+          ${findings.length ? `<ol class="notes">${notes}</ol>` : `
+            <div class="clean"><p>None of the 12 checks found a problem.</p></div>`}
+          <div class="next">
+            <h3>Before you reply</h3>
+            <ul>
+              <li>Find the job on the company's own careers site, not a link in the email.</li>
+              <li>Look the recruiter up on LinkedIn and check they list that company.</li>
+              <li>Never pay for equipment or training, and never deposit a check from an employer you haven't met.</li>
+            </ul>
+          </div>
+          <div class="verdict-actions">
+            <button class="btn btn-quiet" type="button" id="copy">Copy results</button>
+          </div>
+        </aside>
+      </div>`;
+
+    requestAnimationFrame(() => { const fill = $(".meter-fill"); if (fill) fill.style.width = report.score + "%"; });
+
+    document.querySelectorAll(".jump").forEach((b) => b.addEventListener("click", () => {
+      const m = document.querySelector(`mark[data-n="${b.dataset.n}"]`);
+      if (!m) return;
+      m.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      m.classList.remove("flash"); void m.offsetWidth; m.classList.add("flash");
+    }));
+
+    $("#copy").addEventListener("click", async () => {
+      const lines = [
+        "Recruit Guard results for an email from " + view.from,
+        v.title + " Risk score " + report.score + " of 100.",
+        "",
+        ...findings.map((f) => f.n + ". " + severityNames[f.severity] + ": " + f.message + (f.evidence ? " (" + f.evidence + ")" : ""))
+      ];
+      try { await navigator.clipboard.writeText(lines.join("\n")); $("#copy").textContent = "Copied"; }
+      catch { $("#copy").textContent = "Couldn't copy"; }
+      setTimeout(() => { const c = $("#copy"); if (c) c.textContent = "Copy results"; }, 2000);
+    });
+
+    $("#results").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+})();
 </script>
 </body>
 </html>
