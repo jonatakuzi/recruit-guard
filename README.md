@@ -163,7 +163,7 @@ mvn verify               # tests + coverage gate; report at target/site/jacoco/i
 docker build -t recruit-guard .
 ```
 
-Releases are automatic: pushing a tag like `v1.2.0` builds, tests, attaches the jar to a GitHub Release, and publishes the Docker image.
+Releases are automatic: publishing a GitHub Release (for example `v1.2.0`) builds, tests, attaches the jar to it, and publishes the Docker image.
 
 Want to add a company or a new scam pattern? See [CONTRIBUTING.md](CONTRIBUTING.md). A walkthrough of how everything works is in [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).
 
