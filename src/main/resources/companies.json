@@ -1,0 +1,13 @@
+{
+  "Ocient": ["ocient.com"],
+  "Amazon": ["amazon.com", "amazon.jobs"],
+  "Google": ["google.com"],
+  "Microsoft": ["microsoft.com"],
+  "Northrop Grumman": ["northropgrumman.com", "ngc.com"],
+  "Lockheed Martin": ["lockheedmartin.com", "lmco.com"],
+  "Tesla": ["tesla.com"],
+  "Unum": ["unum.com"],
+  "Michelin": ["michelin.com"],
+  "Deloitte": ["deloitte.com"],
+  "Accenture": ["accenture.com"]
+}

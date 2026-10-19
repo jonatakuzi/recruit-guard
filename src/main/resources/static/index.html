@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recruit Guard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #121821; --line: #1f2a37; --text: #e6edf3; --muted: #8b98a8;
+    --accent: #3fb6ff; --low: #2ecc71; --mid: #f5b941; --high: #ff5d5d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 Inter, system-ui, sans-serif; }
+  header { border-bottom: 1px solid var(--line); padding: 18px 24px; display: flex; align-items: center; gap: 12px; }
+  header .logo { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 18px; }
+  header .logo span { color: var(--accent); }
+  header nav { margin-left: auto; display: flex; gap: 18px; }
+  header a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  header a:hover { color: var(--text); }
+  main { max-width: 1100px; margin: 0 auto; padding: 28px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 0 0 14px; color: var(--muted); font-weight: 500; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+  input, textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; color: var(--text);
+    padding: 9px 10px; font: 14px "IBM Plex Mono", monospace; }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { min-height: 160px; resize: vertical; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  button { border: 0; border-radius: 6px; padding: 10px 16px; font: 600 14px Inter, sans-serif; cursor: pointer; }
+  .primary { background: var(--accent); color: #04131f; } .primary:hover { filter: brightness(1.1); }
+  .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); } .ghost:hover { color: var(--text); }
+  .gauge { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .score { font: 600 48px "IBM Plex Mono", monospace; min-width: 96px; }
+  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .bar div { height: 100%; width: 0; transition: width .5s ease, background .5s; }
+  .verdict { font-weight: 700; } .advice { color: var(--muted); font-size: 14px; }
+  .finding { border-left: 3px solid var(--line); padding: 8px 12px; margin: 10px 0; background: var(--bg); border-radius: 0 6px 6px 0; }
+  .finding .tag { font: 600 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .5px; }
+  .finding code { color: var(--muted); font-size: 12px; word-break: break-all; }
+  .HIGH { border-color: var(--high); } .HIGH .tag { color: var(--high); }
+  .MEDIUM { border-color: var(--mid); } .MEDIUM .tag { color: var(--mid); }
+  .LOW, .INFO { border-color: var(--low); } .LOW .tag, .INFO .tag { color: var(--low); }
+  .empty { color: var(--muted); text-align: center; padding: 60px 0; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">recruit<span>_</span>guard</div>
+  <nav><a href="/docs">API docs</a><a href="/actuator/health">Health</a></nav>
+</header>
+
+<main>
+  <section class="panel">
+    <h1>Is this recruiter real?</h1>
+    <h2>Paste a recruiter email to check it for job-scam red flags.</h2>
+    <form id="scan-form">
+      <label for="sender">From address</label>
+      <input id="sender" required placeholder="hiring@company-careers.com">
+      <label for="body">Message</label>
+      <textarea id="body" required placeholder="Paste the email body here..."></textarea>
+      <details>
+        <summary>More options (Reply-To, company, raw headers)</summary>
+        <label for="replyTo">Reply-To address</label>
+        <input id="replyTo" placeholder="optional">
+        <label for="company">Company they claim to represent</label>
+        <input id="company" placeholder="detected automatically if blank">
+        <label for="headers">Raw email headers</label>
+        <textarea id="headers" style="min-height:80px" placeholder="optional - lets us read SPF/DKIM/DMARC results"></textarea>
+      </details>
+      <div class="row">
+        <button class="primary" type="submit">Scan message</button>
+        <button class="ghost" type="button" id="demo-scam">Load scam example</button>
+        <button class="ghost" type="button" id="demo-legit">Load real example</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel" id="result" aria-live="polite">
+    <div class="empty">Results will appear here.</div>
+  </section>
+</main>
+
+<footer>Built by Jon &middot; Java 21 &middot; Spring Boot &middot; <a href="https://github.com/jonatakuzi/recruit-guard" style="color:inherit">source</a></footer>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const examples = {
+    scam: {
+      sender: "Talent Team <hiring@ocient-careers.com>",
+      replyTo: "ocient.onboarding@gmail.com",
+      body: "Congratulations! You have been selected for the Junior Software Engineer role at Ocient. "
+          + "No interview is required. Reply within 24 hours with your Social Security number and bank "
+          + "account details for direct deposit. We will mail you a check to purchase your equipment from our vendor.",
+      headers: "Authentication-Results: mx.google.com; spf=fail; dkim=none; dmarc=fail"
+    },
+    legit: {
+      sender: "Sarah Lee <slee@ocient.com>", replyTo: "",
+      body: "Hi Jon, I'm a recruiter at Ocient. I think you'd be a good fit for our Associate Software Engineer "
+          + "opening. Are you free for a 30-minute phone screen next week? The posting is on our careers page.",
+      headers: "Authentication-Results: mx.google.com; spf=pass; dkim=pass; dmarc=pass"
+    }
+  };
+
+  function load(example) {
+    for (const key of ["sender", "replyTo", "body", "headers"]) $(key).value = example[key];
+    $("company").value = "";
+    $("scan-form").requestSubmit();
+  }
+  $("demo-scam").onclick = () => load(examples.scam);
+  $("demo-legit").onclick = () => load(examples.legit);
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  const verdictLabels = {
+    LOW_RISK: ["Low risk", "var(--low)"],
+    SUSPICIOUS: ["Suspicious", "var(--mid)"],
+    LIKELY_SCAM: ["Likely scam", "var(--high)"]
+  };
+  const advice = {
+    LOW_RISK: "No major red flags found. Still verify the role on the company's own careers site.",
+    SUSPICIOUS: "Don't share personal info until you verify this recruiter independently.",
+    LIKELY_SCAM: "Do not reply with personal or financial information."
+  };
+
+  function render(report) {
+    const [label, color] = verdictLabels[report.verdict];
+    const findings = report.findings.length
+      ? report.findings.map(f => `
+          <div class="finding ${f.severity}">
+            <div class="tag">${f.severity} &middot; ${escapeHtml(f.ruleId)}</div>
+            <div>${escapeHtml(f.message)}</div>
+            ${f.evidence ? `<code>${escapeHtml(f.evidence)}</code>` : ""}
+          </div>`).join("")
+      : `<p class="advice">No red flags matched.</p>`;
+    $("result").innerHTML = `
+      <div class="gauge">
+        <div class="score" style="color:${color}">${report.score}</div>
+        <div style="flex:1">
+          <div class="verdict" style="color:${color}">${label}</div>
+          <div class="advice">${advice[report.verdict]}</div>
+          <div class="bar"><div id="fill"></div></div>
+        </div>
+      </div>
+      ${report.claimedCompany ? `<p class="advice">Claims to be from <b>${escapeHtml(report.claimedCompany)}</b></p>` : ""}
+      ${findings}`;
+    requestAnimationFrame(() => { $("fill").style.width = report.score + "%"; $("fill").style.background = color; });
+  }
+
+  $("scan-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("result").innerHTML = `<div class="empty">Scanning...</div>`;
+    const payload = {
+      sender: $("sender").value, replyTo: $("replyTo").value || null,
+      claimedCompany: $("company").value || null, body: $("body").value, headers: $("headers").value || null
+    };
+    try {
+      const res = await fetch("/api/v1/scan", {
+        method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Request failed");
+      render(data);
+    } catch (err) {
+      $("result").innerHTML = `<div class="empty">Error: ${escapeHtml(err.message)}</div>`;
+    }
+  });
+</script>
+</body>
+</html>
